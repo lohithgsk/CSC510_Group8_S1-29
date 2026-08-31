@@ -1,0 +1,53 @@
+You are a senior engineer who joined this project one hour ago. Below is the
+output of tree -L 3 and the full README.
+
+In 300 words or less:
+1. Name the main components and what each one does.
+2. List the five files that matter most, ranked. One sentence each on why.
+3. Name one directory we can safely ignore this month.
+
+Do not guess. If the tree does not show enough, tell me exactly which file to
+paste next.
+Thought for 31s
+
+A note: no sample JSON payload was actually included in this turn — only the router code. I've derived the exact response shape directly from the res.json(...) calls in the code itself, so the table below is grounded in what the code provably returns, not a guess at business logic.
+Offense	Evidence	Consumer Impact
+Inconsistent Response Envelope	Success path returns a flat object with no wrapper field: return res.json({ totalMealsRescued, totalMoneySaved, foodWastePrevented, carbonReduced, participatingRestaurants: restaurantSet.size, activeUsers: userSet.size, topUsers });. Error path returns a completely different shape: return res.status(500).json({ error: "Failed to compute community stats." });. Neither shares a common field like success or data.	The frontend can't write one generic response parser for this endpoint — it must special-case "does the body have an error key" to detect failure, which breaks the moment a legitimate future stat field happens to be named error.
+Misleading 200 OK on Silent Upstream Failure	const orders = loadOrders(); — loadOrders() (defined earlier in the file) internally catches all fs/JSON.parse errors and returns [] with no signal to the caller. The route handler has no way to distinguish that from a genuinely empty orders file, and proceeds straight to return res.json({ totalMealsRescued, ... }) with a 200.	If orders.json is corrupted or unreadable, the client receives a fully-formed 200 response with totalMealsRescued: 0, indistinguishable from "no orders have ever been placed." Any dashboard or alerting built on this trend line will silently show a false zero instead of an error state.
+Generic Status Code for All Failure Modes	catch (err) { console.error("Error in /dashboard/community-stats:", err); return res.status(500).json({ error: "Failed to compute community stats." }); } — every possible thrown error, regardless of cause, collapses to the same 500 with the same static message.	The frontend has no way to tell a transient failure (worth retrying) from a permanent bug (worth surfacing to the user), so any retry logic has to blindly retry on every 500 rather than being told anything actionable via status code or error code.
+Untyped/Unrounded Currency Field	const saved = qty * Math.max(original - price, 0); totalMoneySaved += saved; — raw floating-point arithmetic, returned unrounded as totalMoneySaved in the JSON body, and the same pattern repeats inside top3WithValues for moneySaved.	Every consumer of this endpoint independently has to remember to round to two decimals before displaying a dollar amount, or risk rendering floating-point artifacts (e.g. 12.990000000000002) straight to users — formatting responsibility leaks from the server into every client.
+Leaky Abstraction: Unauthenticated PII in Response Body	const emailToName = {}; users.forEach(u => { emailToName[u.email] = u.name; }); then top3WithValues surfaces `name: emailToName[email]	
+Dashboard.jsx
+Dashboard.jsx
+JSX
+Message collapsed
+Viewed 9 files, ran 6 commands
+
+A note on scope: this file has no single unified state machine (no useReducer, no discriminated-union state) — it's 15 independent useState calls. So "states" here means the observable combinations those variables produce, and "impossible states" means combinations the shape of that state technically permits even though the app was clearly never meant to display them.
+1. Intended states
+
+Primary view states (driven by currentView, declared Line 79, values confirmed by every setCurrentView(...) call in the file):
+
+    browse (default)
+    impact
+    community
+    leaderboard
+    cart
+    restaurant-detail
+
+Overlay states (independent booleans layered on top of any view):
+
+    Mobile menu open/closed (showMobileMenu, Line 83)
+    Logout confirmation open/closed (showLogoutConfirm, Line 86)
+    Add-to-cart toast shown/hidden (showCartToast, Line 85)
+
+Intended async data states (never explicitly modeled, but implied by the fetches at Lines 133–245): Idle → Loading → Loaded, or Idle → Loading → Error, for restaurants, userImpact, communityStats, and userOrders.
+2. Impossible states (code-provable) and 3. user impact
+#	Impossible state	Cited lines	What the user sees
+1	currentView === 'restaurant-detail' while selectedRestaurant === null	currentView (Line 79) and selectedRestaurant (Line 88) are separate useState hooks with no enforced link. Every current call site pairs them correctly (Lines 1003–1006), but nothing in the state shape prevents one from firing without the other — <RestaurantDetail restaurant={selectedRestaurant} .../> at Line 1466 will render whatever selectedRestaurant happens to hold.	Not reachable through today's UI, but this is a latent landmine: the moment any future code path calls setCurrentView('restaurant-detail') without also calling setSelectedRestaurant(...) — easy to do by accident since they're two unrelated calls — RestaurantDetail receives restaurant={null} and the app is one restaurant.name access away from a hard crash.
+2	showCartToast === true while the cart was not actually updated	setShowCartToast(true) (Line 355) sits outside the setCart updater (Lines 302–353) and fires unconditionally. In the sold-out/at-cap branch (Lines 314–317), the updater returns current unchanged and setLastAddedInfo is never called.	User clicks "Rescue" on a meal that's sold out or already at its per-order cap. The cart doesn't change, but a green toast still pops up reading "Added [some previous item] (x[previous qty]) to cart" (Line 673–675) — or the generic fallback text if nothing was ever added — falsely confirming an action that didn't happen.
+3	ordersError !== null while userOrders.length > 0	userOrders is populated from localStorage at Line 184 before the network fetch runs. The fetch's .catch (Lines 240–243) sets ordersError but never clears or flags userOrders as stale.	On the Impact tab, the user sees a red "We could not load your order history right now" banner (Line 1174) sitting directly above a fully populated "Your recent rescues" list with real order data (Line 1233). The UI simultaneously claims the data failed to load and displays it — the user has no way to know if what they're looking at is current.
+4	showMobileMenu === true while showLogoutConfirm is open or was just closed	The mobile menu's "Log out" button (Line 841) calls handleLogoutClick (Line 247), which sets only showLogoutConfirm. cancelLogout (Line 256) resets only showLogoutConfirm. Neither touches showMobileMenu (Line 83).	On mobile: user opens the hamburger menu, taps "Log out," sees the confirm dialog, taps "Cancel" — the dialog closes but the hamburger dropdown, which was never explicitly dismissed, is still sitting open behind it and reappears.
+5	restaurants === [] / userImpact all-zero, with no way to distinguish "still fetching" from "confirmed empty"	restaurants initializes to [] (Line 91) and userImpact initializes to an all-zero object (Lines 92–99). No isLoading state exists anywhere in the file. The fetch at Line 133 only ever calls setRestaurants/setCommunityStats on success, static-fallback, or silent-log-on-failure — there's no intermediate "in flight" flag.	For however long the initial fetch takes (and permanently, if it fails and even the static fallback is empty), the Browse tab shows an empty restaurant grid and the Impact tab shows "0 meals ordered · New Rescuer" — pixel-identical to a legitimate brand-new user who has genuinely never ordered anything. There's no spinner or skeleton state to tell the two apart.
+
+Most consequential: #3 (contradictory order-history error + data) and #2 (false "added to cart" confirmation) are the two that actively mislead the user about the true state of their data, rather than just looking unpolished — those are the ones I'd prioritize fixing first.
