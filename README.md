@@ -1,4 +1,8 @@
 # CSC-510-SE-Project
+
+> [!NOTE]
+> This fork is for the submission of Project 1a by Group 6 in Software Engineering Fall 2026 Course. The Project Tiffin Trails was developed by students from Fall 2025
+
 # TiffinTrails
 
 [![Contributors](https://img.shields.io/github/contributors/YashDhavale/CSC-510-SE-Project
