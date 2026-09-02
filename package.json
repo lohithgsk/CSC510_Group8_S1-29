@@ -1,0 +1,22 @@
+{
+  "name": "csc510_group8_s1-29",
+  "version": "1.0.0",
+  "description": "[![Contributors](https://img.shields.io/github/contributors/YashDhavale/CSC-510-SE-Project\r )](https://github.com/YashDhavale/CSC-510-SE-Project/graphs/contributors)\r [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17554204.svg)](https://doi.org/10.5281/zenodo.17554204)\r [![Python Version](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3100/)\r [![Last Commit](https://img.shields.io/github/last-commit/YashDhavale/CSC-510-SE-Project/proj2)](https://github.com/YashDhavale/CSC-510-SE-Project/commits/main)\r [![Issues](https://img.shields.io/github/issues/YashDhavale/CSC-510-SE-Project)](https://github.com/YashDhavale/CSC-510-SE-Project/issues)\r ![License](https://img.shields.io/github/license/YashDhavale/CSC-510-SE-Project)\r [![Forks](https://img.shields.io/github/forks/YashDhavale/CSC-510-SE-Project)](https://github.com/YashDhavale/CSC-510-SE-Project/network/members)\r [![Discussions](https://img.shields.io/github/discussions/YashDhavale/CSC-510-SE-Project)](https://github.com/YashDhavale/CSC-510-SE-Project/discussions)\r [![Open PRs](https://img.shields.io/github/issues-pr/YashDhavale/CSC-510-SE-Project)](https://github.com/YashDhavale/CSC-510-SE-Project/pulls)\r ![License](https://img.shields.io/github/license/YashDhavale/CSC-510-SE-Project)\r [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.0-4baaaa.svg)](https://github.com/YashDhavale/CSC-510-SE-Project/blob/main/Code_of_Conduct.md)\r [![Contributing](https://img.shields.io/badge/Welcome-😊-blue?style=for-the-badge)](https://github.com/YashDhavale/CSC-510-SE-Project/blob/proj2/CONTRIBUTING.md)\r [![Install](https://img.shields.io/badge/Guide-grey?style=flat-square&logo=openbook)](https://github.com/YashDhavale/CSC-510-SE-Project/blob/proj2/INSTALL.md)\r ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)\r ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white)\r ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)\r ![CSV](https://img.shields.io/badge/CSV-000000?style=for-the-badge&logo=files&logoColor=white)\r ![Code Style: Black](https://img.shields.io/badge/code%20style-black-000000.svg)\r ![Linted with Flake8](https://img.shields.io/badge/lint-flake8-blue)\r ![Formatted with Prettier](https://img.shields.io/badge/code%20style-prettier-ff69b4.svg)\r ![ESLint Status](https://img.shields.io/badge/lint-eslint-yellow)\r ![Code Style: Black](https://img.shields.io/badge/code%20style-black-000000.svg)\r ![Linted with Flake8](https://img.shields.io/badge/lint-flake8-blue)\r ![Formatted with Prettier](https://img.shields.io/badge/code%20style-prettier-ff69b4.svg)\r ![ESLint Status](https://img.shields.io/badge/lint-eslint-yellow)\r [![Coverage](https://img.shields.io/codecov/c/github/YashDhavale/CSC-510-SE-Project?logo=codecov)](https://app.codecov.io/gh/YashDhavale/CSC-510-SE-Project)\r ![CodeQL](https://img.shields.io/github/actions/workflow/status/YashDhavale/CSC-510-SE-Project/codeql.yml?label=CodeQL%20Analysis&logo=github)",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lohithgsk/CSC510_Group8_S1-29.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lohithgsk/CSC510_Group8_S1-29/issues"
+  },
+  "homepage": "https://github.com/lohithgsk/CSC510_Group8_S1-29#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.62.1",
+    "@types/node": "^26.4.1"
+  }
+}
